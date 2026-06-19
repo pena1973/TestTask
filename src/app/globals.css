@@ -1,0 +1,192 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-brand: "Bebas Neue";
+  --font-display: "Bebas Neue";
+  --font-body: "Trebuchet MS";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: #17140f;
+  background: #f6efd9;
+}
+
+.page-background {
+  min-height: calc(100vh - 36px);
+  background-color: #f6efd9;
+  background-image: url("/images/background.png");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #2f406d;
+  outline-offset: 2px;
+}
+
+/* Поля формы в макете выглядят как линии, поэтому убираем браузерную рамку фокуса у input/textarea. */
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+.paper-panel {
+  border: 3px solid #1f1a14;
+  background: rgba(246, 239, 217, 0.9);
+  box-shadow: 3px 3px 0 rgba(23, 20, 15, 0.18);
+}
+
+.ink-line {
+  border-color: #1f1a14;
+}
+
+.brand-title {
+  font-family: var(--font-brand), "Arial Narrow", Impact, sans-serif;
+  letter-spacing: 0;
+}
+
+.tile-art {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 2px solid #1f1a14;
+  background-color: #f7eed4;
+}
+
+.design-grid-lines {
+  background:
+    repeating-linear-gradient(to right, transparent 0 calc(10% - 1px), #1f1a14 calc(10% - 1px) 10%),
+    repeating-linear-gradient(to bottom, transparent 0 calc(10% - 1px), #1f1a14 calc(10% - 1px) 10%),
+    #f6efd9;
+}
+
+.design-scroll {
+  --design-scrollbar-size: 20px;
+
+  scrollbar-color: #2f406d #f6efd9;
+  scrollbar-width: auto;
+  scrollbar-gutter: stable;
+}
+
+.design-scroll::-webkit-scrollbar {
+  width: var(--design-scrollbar-size);
+  height: var(--design-scrollbar-size);
+}
+
+.design-scroll::-webkit-scrollbar-track {
+  background: #f6efd9;
+  border-left: 1px solid #1f1a14;
+  border-top: 1px solid #1f1a14;
+}
+
+.design-scroll::-webkit-scrollbar-thumb {
+  background: #2f406d;
+  border: 1px solid #1f1a14;
+  border-radius: 6px;
+}
+
+.design-scroll::-webkit-scrollbar-corner {
+  background: #f6efd9;
+}
+
+
+.tile-art::before,
+.tile-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.tile-wave {
+  background:
+    radial-gradient(circle at 28% 45%, transparent 0 21%, #2f406d 22% 28%, transparent 29%),
+    repeating-radial-gradient(ellipse at 45% 50%, transparent 0 8px, #2f406d 9px 12px, transparent 13px 18px),
+    #f6efd9;
+}
+
+.tile-wave::after {
+  background: linear-gradient(135deg, rgba(47, 64, 109, 0.92) 0 22%, transparent 23% 100%);
+}
+
+.tile-fern {
+  background:
+    repeating-linear-gradient(160deg, transparent 0 14px, rgba(75, 143, 130, 0.85) 15px 19px, transparent 20px 34px),
+    #f6efd9;
+}
+
+.tile-fern::before {
+  transform: rotate(-32deg);
+  background:
+    linear-gradient(90deg, transparent 47%, #2f766d 48% 52%, transparent 53%),
+    radial-gradient(ellipse at 56% 36%, #4b8f82 0 10%, transparent 11%),
+    radial-gradient(ellipse at 43% 48%, #4b8f82 0 9%, transparent 10%),
+    radial-gradient(ellipse at 58% 62%, #4b8f82 0 10%, transparent 11%);
+}
+
+.tile-dot {
+  background:
+    radial-gradient(circle at 22% 28%, #bf6f4f 0 9%, transparent 10%),
+    radial-gradient(circle at 62% 22%, #bf6f4f 0 8%, transparent 9%),
+    radial-gradient(circle at 36% 62%, #bf6f4f 0 11%, transparent 12%),
+    radial-gradient(circle at 76% 70%, #bf6f4f 0 8%, transparent 9%),
+    #f6efd9;
+}
+
+.tile-star {
+  background:
+    conic-gradient(from 18deg at 52% 48%, #d2a33b 0 9%, transparent 10% 16%, #d2a33b 17% 26%, transparent 27% 33%, #d2a33b 34% 43%, transparent 44% 50%, #d2a33b 51% 60%, transparent 61% 67%, #d2a33b 68% 77%, transparent 78% 84%, #d2a33b 85% 94%, transparent 95%),
+    #f6efd9;
+}
+
+.tile-diamond {
+  background:
+    linear-gradient(45deg, transparent 30%, #bf6f4f 31% 48%, transparent 49%),
+    linear-gradient(-45deg, transparent 30%, #2f406d 31% 48%, transparent 49%),
+    radial-gradient(circle at 50% 50%, #f6efd9 0 18%, #4b8f82 19% 27%, transparent 28%),
+    #f6efd9;
+}
+
+.tile-blueStar {
+  background:
+    radial-gradient(circle at 50% 50%, #f6efd9 0 9%, transparent 10%),
+    conic-gradient(from 45deg, #2f406d 0 12%, #f6efd9 13% 25%, #2f406d 26% 38%, #f6efd9 39% 51%, #2f406d 52% 64%, #f6efd9 65% 77%, #2f406d 78% 90%, #f6efd9 91%),
+    #f6efd9;
+}
+
+.tile-weave {
+  background:
+    repeating-linear-gradient(45deg, rgba(75, 143, 130, 0.8) 0 5px, transparent 6px 14px),
+    repeating-linear-gradient(-45deg, rgba(47, 64, 109, 0.35) 0 5px, transparent 6px 14px),
+    #f6efd9;
+}
+
+.tile-bird {
+  background:
+    radial-gradient(ellipse at 58% 46%, #2f406d 0 16%, transparent 17%),
+    radial-gradient(ellipse at 42% 45%, #4b8f82 0 11%, transparent 12%),
+    linear-gradient(140deg, transparent 45%, #bf6f4f 46% 54%, transparent 55%),
+    #f6efd9;
+}
