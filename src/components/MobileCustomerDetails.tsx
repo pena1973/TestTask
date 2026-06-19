@@ -15,7 +15,7 @@ export function MobileCustomerDetails() {
   }
 
   return (
-    <section className="lg:hidden">
+    <section className="mobile-customer-details md:hidden">
       {/* Группа customer fields повторяет верхнюю часть mobile-дизайна. */}
       <div className="grid gap-3 font-display text-xl font-black uppercase">
         <MobileField label="Customer Name" value={form.customerName} onChange={(value) => handleFieldChange("customerName", value)} />
@@ -23,18 +23,37 @@ export function MobileCustomerDetails() {
           <MobileField label="Phone" value={form.phone} onChange={(value) => handleFieldChange("phone", value)} />
           <MobileField label="Email" value={form.email} onChange={(value) => handleFieldChange("email", value)} />
         </div>
-        <MobileField label="Shipping Address" value={form.shippingAddress} onChange={(value) => handleFieldChange("shippingAddress", value)} />
+        <MobileField label="Shipping Address" value={form.shippingAddress} multiline onChange={(value) => handleFieldChange("shippingAddress", value)} />
       </div>
     </section>
   );
 }
 
 // MobileField рисует одну строку с подписью и линией ввода.
-function MobileField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function MobileField({ label, value, multiline = false, onChange }: { label: string; value: string; multiline?: boolean; onChange: (value: string) => void }) {
+  const [firstLine = "", secondLine = ""] = multiline ? value.split("\n") : [value, ""];
+
+  // handleMultilineChange собирает две строки shipping address обратно в одно Redux-поле.
+  function handleMultilineChange(nextFirstLine: string, nextSecondLine: string) {
+    onChange([nextFirstLine, nextSecondLine].filter(Boolean).join("\n"));
+  }
+
   return (
-    <label className="block">
+    <label className={multiline ? "mobile-field-multiline" : "block"}>
       <span>{label}:</span>
-      <input className="w-full border-b-3 border-line bg-transparent px-2 py-1 normal-case" value={value} onChange={(event) => onChange(event.target.value)} />
+      <input
+        className="w-full border-b-3 border-line bg-transparent px-2 py-1 normal-case"
+        value={multiline ? firstLine : value}
+        onChange={(event) => (multiline ? handleMultilineChange(event.target.value, secondLine) : onChange(event.target.value))}
+      />
+      {multiline ? (
+        <input
+          className="mobile-field-extra-line w-full border-b-3 border-line bg-transparent px-2 py-1 normal-case"
+          value={secondLine}
+          onChange={(event) => handleMultilineChange(firstLine, event.target.value)}
+          aria-label={`${label} second line`}
+        />
+      ) : null}
     </label>
   );
 }

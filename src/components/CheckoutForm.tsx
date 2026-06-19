@@ -55,20 +55,22 @@ export function CheckoutForm() {
   }
 
   return (
-    <section id="summary" className="p-1">
+    <section id="summary" className="summary-tool p-[var(--summary-padding)] md:col-start-2 min-[1300px]:col-start-3">
+      {/* MobilePaymentPanel: отдельная мобильная версия блока оплаты и заметок из макета. */}
+      <MobilePaymentPanel paymentMethod={paymentMethod} projectNotes={form.projectNotes} onSelect={(method) => dispatch(setPaymentMethod(method))} onProjectNotesChange={(value) => handleFieldChange("projectNotes", value)} />
       {/* Заголовок блока сделан вкладкой: рамка только вокруг текста, а нижняя линия уходит вправо. */}
-      <div className="mb-2 flex items-end">
-        <h2 className="w-1/2 border-2 border-line border-b-0 bg-sand px-2 py-0.5 font-display text-xl font-black uppercase leading-none font-normal tracking-wide">
+      <div className="mb-2 hidden items-end md:flex">
+        <h2 className="w-1/2 border-2 border-line border-b-0 bg-sand px-[var(--summary-title-x)] py-0.5 font-display text-[var(--summary-title-size)] font-normal uppercase leading-none tracking-wide">
           Order Summary
         </h2>
         <span className="h-0 flex-1 border-b-2 border-line" />
       </div>
 
-      <form className="space-y-2" onSubmit={handleSubmit} noValidate>
+      <form className="hidden space-y-[var(--summary-gap)] md:block" onSubmit={handleSubmit} noValidate>
         {/* Контактные данные сделаны плотными строками, как на референсе. */}
-        <div className="hidden font-display text-sm font-black uppercase leading-tight lg:block">
+        <div className="hidden font-display text-[var(--summary-field-size)] font-normal uppercase leading-tight md:block">
           <CompactField label="Customer Name" placeholder="A. Smith" value={form.customerName} error={submitted ? errors.customerName : undefined} onChange={(value) => handleFieldChange("customerName", value)} />
-          <div className="grid grid-cols-[42%_minmax(0,58%)] gap-2 overflow-hidden">
+          <div className="grid grid-cols-[42%_minmax(0,58%)] gap-[var(--summary-gap)] overflow-hidden">
             <CompactField label="Phone" placeholder="+1 555 0100" value={form.phone} error={submitted ? errors.phone : undefined} onChange={(value) => handleFieldChange("phone", value)} />
             <CompactField label="Email" placeholder="a.smith@email.com" value={form.email} error={submitted ? errors.email : undefined} onChange={(value) => handleFieldChange("email", value)} />
           </div>
@@ -77,8 +79,8 @@ export function CheckoutForm() {
         </div>
 
         {/* Горизонтальная линия отделяет контактные данные от итогов заказа. */}
-        <div className="hidden border-t-3 border-line pt-2 lg:block">
-          <div className="ml-auto w-[150px] font-display text-base font-black uppercase leading-tight">
+        <div className="hidden border-t-3 border-line pt-2 md:block">
+          <div className="ml-auto w-[var(--summary-total-width)] font-display text-[var(--summary-total-size)] font-normal uppercase leading-tight">
             <SummaryLine label="Subtotal" value={formatMoney(subtotal)} />
             <SummaryLine label="Shipping" value={formatMoney(shipping)} />
             <SummaryLine label="Grand Total" value={formatMoney(subtotal + shipping)} />
@@ -87,46 +89,46 @@ export function CheckoutForm() {
 
         {/* Методы оплаты: верхняя строка с Credit Card и PayPal. */}
         <div>
-          <h3 className="mb-1 inline-block border-3 border-line bg-sand px-2 py-0.5 font-display text-base font-black uppercase leading-none">
+          <h3 className="mb-1 inline-block border-3 border-line bg-sand px-[var(--summary-title-x)] py-0.5 font-display text-[var(--summary-method-title-size)] font-normal uppercase leading-none">
             Select Payment Method:
           </h3>
-          <div className="mb-1 grid grid-cols-2 gap-2 font-display text-sm font-black uppercase">
+          <div className="mb-1 grid grid-cols-2 gap-[var(--summary-gap)] font-display text-[var(--summary-radio-size)] font-normal uppercase">
             <PaymentRadio id="card" label="Credit/Debit Card" selected={paymentMethod === "card"} onSelect={() => dispatch(setPaymentMethod("card"))} />
             <PaymentRadio id="paypal" label="PayPal" selected={paymentMethod === "paypal"} onSelect={() => dispatch(setPaymentMethod("paypal"))} />
           </div>
         </div>
 
         {/* Блок карты остаётся компактным и похожим на нарисованную карточку в макете. */}
-        <div className="rounded-md border-3 border-line bg-sand/70 p-2">
-          <div className="mb-1 flex items-center gap-2">
+        <div className="rounded-md border-3 border-line bg-sand/70 p-[var(--summary-card-padding)]">
+          <div className="mb-1 flex items-center gap-[var(--summary-gap)]">
             <span className={`h-4 w-4 rounded-full border-2 border-line ${paymentMethod === "card" ? "bg-ochre" : "bg-paper"}`} />
-            <span className="rounded border-2 border-line bg-paper px-2 font-display text-sm font-black text-navy">VISA</span>
+            <span className="rounded border-2 border-line bg-paper px-[var(--summary-title-x)] font-display text-[var(--summary-radio-size)] font-normal text-navy">VISA</span>
             <span className="flex h-5 w-9 items-center justify-center rounded border-2 border-line bg-paper">
               <span className="h-3.5 w-3.5 rounded-full bg-terracotta" />
               <span className="-ml-1 h-3.5 w-3.5 rounded-full bg-ochre" />
             </span>
           </div>
           <CompactInput label="Card Number" placeholder="1234 4556 7723 8990" value={form.cardNumber} error={submitted ? errors.cardNumber : undefined} onChange={(value) => handleFieldChange("cardNumber", value)} />
-          <div className="mt-1 grid grid-cols-2 gap-2">
+          <div className="mt-1 grid grid-cols-2 gap-[var(--summary-gap)]">
             <CompactInput label="Expiration /" placeholder="05/29" value={form.expiration} error={submitted ? errors.expiration : undefined} onChange={(value) => handleFieldChange("expiration", value)} />
             <CompactInput label="CVV" placeholder="123" value={form.cvv} error={submitted ? errors.cvv : undefined} onChange={(value) => handleFieldChange("cvv", value)} />
           </div>
         </div>
 
         {/* Нижняя строка содержит две крупные кнопки Apple Pay и Bank Transfer. */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-[var(--summary-gap)]">
           <PaymentTile id="apple" title="Apple Pay" icon="Apple Pay" selected={paymentMethod === "apple"} onSelect={() => dispatch(setPaymentMethod("apple"))} />
           <PaymentTile id="bank" title="Bank Transfer" icon="Bank" selected={paymentMethod === "bank"} onSelect={() => dispatch(setPaymentMethod("bank"))} />
         </div>
 
         {/* Кнопка отправки запускает только frontend-валидацию. */}
-        <button type="submit" className="w-full rounded-md border-3 border-line bg-navy px-3 py-2 font-display text-xl font-black uppercase leading-none text-paper shadow-sketch">
+        <button type="submit" className="w-full rounded-md border-3 border-line bg-navy px-3 py-[var(--summary-button-y)] font-display text-[var(--summary-button-size)] font-normal uppercase leading-none text-paper shadow-sketch">
           Place Secure Order
         </button>
 
         {/* Статус сообщает результат проверки формы. */}
         {submitted ? (
-          <p className={`font-display text-base font-black uppercase leading-tight ${isValid ? "text-teal" : "text-terracotta"}`}>
+          <p className={`font-display text-[var(--summary-method-title-size)] font-normal uppercase leading-tight ${isValid ? "text-teal" : "text-terracotta"}`}>
             {isValid ? "Order is ready for frontend demo checkout." : "Please complete the highlighted fields."}
           </p>
         ) : null}
@@ -136,6 +138,67 @@ export function CheckoutForm() {
 }
 
 // CompactField рисует строку с подписью и тонкой линией ввода.
+// MobilePaymentPanel показывает компактный выбор оплаты и поле заметок в мобильном макете.
+function MobilePaymentPanel({
+  paymentMethod,
+  projectNotes,
+  onSelect,
+  onProjectNotesChange
+}: {
+  paymentMethod: PaymentMethod;
+  projectNotes: string;
+  onSelect: (method: PaymentMethod) => void;
+  onProjectNotesChange: (value: string) => void;
+}) {
+  return (
+    <div className="mobile-payment-panel md:hidden">
+      {/* Заголовок мобильного выбора оплаты сделан вкладкой, как в референсе. */}
+      <h3 className="inline-block border-2 border-line bg-sand px-2 py-0.5 font-display text-[clamp(15px,3.4vw,20px)] font-normal uppercase leading-none">
+        Select Payment Method:
+      </h3>
+
+      {/* Сетка методов оплаты: четыре одинаковые ячейки в одну строку. */}
+      <div className="grid grid-cols-4 border-2 border-line font-display uppercase leading-none">
+        <MobilePayButton method="card" title="Credit/Debit Card" icon="card" selected={paymentMethod === "card"} onSelect={onSelect} />
+        <MobilePayButton method="paypal" title="PayPal" icon="paypal" selected={paymentMethod === "paypal"} onSelect={onSelect} />
+        <MobilePayButton method="apple" title="Apple Pay" icon="apple" selected={paymentMethod === "apple"} onSelect={onSelect} />
+        <MobilePayButton method="bank" title="Bank Transfer" icon="bank" selected={paymentMethod === "bank"} onSelect={onSelect} />
+      </div>
+
+      {/* Project notes в мобильном дизайне перенесены под оплату отдельной строкой. */}
+      <label className="mt-3 flex items-end gap-3 font-display text-[clamp(16px,3.5vw,22px)] font-normal uppercase leading-none">
+        <span className="shrink-0">Project Name / Notes:</span>
+        <input className="min-w-0 flex-1 border-b-3 border-line bg-transparent px-2 leading-none" value={projectNotes} onChange={(event) => onProjectNotesChange(event.target.value)} />
+      </label>
+    </div>
+  );
+}
+
+// MobilePayButton рисует одну мобильную кнопку способа оплаты с круглым индикатором.
+function MobilePayButton({ method, title, icon, selected, onSelect }: { method: PaymentMethod; title: string; icon: "card" | "paypal" | "apple" | "bank"; selected: boolean; onSelect: (method: PaymentMethod) => void }) {
+  return (
+    <button type="button" className="grid min-h-[82px] grid-cols-[18px_1fr] items-start border-r-2 border-line px-1.5 py-2 text-left last:border-r-0" onClick={() => onSelect(method)}>
+      <span className={`mt-2 h-4 w-4 rounded-full border-2 border-line ${selected ? "bg-ochre" : "bg-paper"}`} />
+      <span className="grid justify-items-center gap-1 text-center">
+        <MobilePayIcon icon={icon} />
+        <span className="max-w-[82px] text-[clamp(12px,2.6vw,16px)] font-normal leading-none">{title}</span>
+      </span>
+    </button>
+  );
+}
+
+// MobilePayIcon имитирует простые пиктограммы из мобильного макета без внешних библиотек.
+function MobilePayIcon({ icon }: { icon: "card" | "paypal" | "apple" | "bank" }) {
+  const icons = {
+    card: "/images/payment_card.png",
+    paypal: "/images/payment_paypal.png",
+    apple: "/images/payment_apple.png",
+    bank: "/images/payment_bank.png"
+  };
+
+  return <img className="h-[34px] w-[58px] object-contain" src={icons[icon]} alt="" aria-hidden="true" />;
+}
+
 function CompactField({ label, placeholder, value, error, onChange }: { label: string; placeholder: string; value: string; error?: string; onChange: (value: string) => void }) {
   return (
     <label className="flex min-w-0 items-end gap-1 overflow-hidden">
@@ -153,10 +216,10 @@ function CompactField({ label, placeholder, value, error, onChange }: { label: s
 // CompactInput рисует маленькое поле внутри карточного блока.
 function CompactInput({ label, placeholder, value, error, onChange }: { label: string; placeholder: string; value: string; error?: string; onChange: (value: string) => void }) {
   return (
-    <label className="block font-display text-xs font-black uppercase leading-tight">
+    <label className="block font-display text-xs font-normal uppercase leading-tight">
       <span>{label}</span>
       <input
-        className={`mt-0.5 h-7 w-full rounded border-2 bg-paper px-2 text-sm normal-case placeholder:text-ink/70 ${error ? "border-terracotta" : "border-line"}`}
+        className={`mt-0.5 h-[var(--summary-input-height)] w-full rounded border-2 bg-paper px-[var(--summary-title-x)] text-[var(--summary-radio-size)] normal-case placeholder:text-ink/70 ${error ? "border-terracotta" : "border-line"}`}
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -188,7 +251,7 @@ function PaymentRadio({ label, selected, onSelect }: { id: PaymentMethod; label:
 // PaymentTile рисует крупную нижнюю плитку метода оплаты.
 function PaymentTile({ title, icon, selected, onSelect }: { id: PaymentMethod; title: string; icon: string; selected: boolean; onSelect: () => void }) {
   return (
-    <button type="button" className={`min-h-16 rounded border-3 p-2 font-display font-black uppercase leading-none ${selected ? "bg-sand shadow-sketch" : "bg-paper/70"}`} onClick={onSelect}>
+    <button type="button" className={`min-h-16 rounded border-3 p-2 font-display font-normal uppercase leading-none ${selected ? "bg-sand shadow-sketch" : "bg-paper/70"}`} onClick={onSelect}>
       <span className="mb-1 flex items-center gap-2 text-left text-sm">
         <span className={`h-4 w-4 rounded-full border-2 border-line ${selected ? "bg-ochre" : "bg-paper"}`} />
         <span className="text-lg normal-case">{icon}</span>

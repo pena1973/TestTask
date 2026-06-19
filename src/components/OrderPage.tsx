@@ -23,7 +23,7 @@ export function OrderPage() {
         <Header />
 
         {/* Content: корзина, desktop-визуализатор и checkout-форма. */}
-        <div className="relative z-10 mx-auto grid max-w-[1700px] gap-6 px-4 py-6 md:px-6 lg:grid-cols-[35%_45%_20%]">
+        <div className="workspace-grid relative z-10 mx-auto grid max-w-[1700px] px-[clamp(12px,1.4vw,24px)] py-6 md:grid-cols-[35fr_20fr] min-[1300px]:grid-cols-[35fr_45fr_20fr]">
           {/* MobileCustomerDetails: на узком экране поля клиента стоят над таблицей, как в PNG-макете. */}
           <MobileCustomerDetails />
 

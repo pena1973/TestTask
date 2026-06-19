@@ -1,9 +1,9 @@
 // Header является первым элементом рабочей области под липким меню.
 export function Header() {
   return (
-    <div className="px-4 py-4 text-center md:px-8">
+    <div className="site-title px-4 py-4 text-center md:px-8">
       {/* Центральная часть разделена на три зоны: левая иконка, основной текст, правая иконка. */}
-      <div className="mx-auto grid max-w-[860px] grid-cols-[130px_minmax(0,1fr)_130px] items-center gap-1">
+      <div className="mx-auto grid max-w-[860px] grid-cols-1 items-center gap-1 md:grid-cols-[130px_minmax(0,1fr)_130px]">
         {/* Левая часть: картинка мастерской из public/images/pic1.png. */}
         <WorkshopImage />
 
@@ -42,10 +42,10 @@ function TileImage({ src, alt }: { src: string; alt: string }) {
 
 // WorkshopImage выводит левую декоративную картинку здания из папки public.
 function WorkshopImage() {
-  return <img className="h-[130px] w-[130px] object-contain" src="/images/pic1.png" alt="Workshop" />;
+  return <img className="hidden h-[130px] w-[130px] object-contain md:block" src="/images/pic1.png" alt="Workshop" />;
 }
 
 // KilnImage выводит правую декоративную картинку печи из папки public.
 function KilnImage() {
-  return <img className="h-[130px] w-[130px] object-contain" src="/images/pic2.png" alt="Kiln" />;
+  return <img className="hidden h-[130px] w-[130px] object-contain md:block" src="/images/pic2.png" alt="Kiln" />;
 }
