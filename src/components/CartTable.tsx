@@ -1,19 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { decrementQuantity, incrementQuantity, setQuantity } from "@/store/orderSlice";
+import type { DragEvent, ReactNode } from "react";
+import { addTileToCart, incrementQuantity, removeItem, setQuantity } from "@/store/orderSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { calculateShipping, calculateSubtotal, formatMoney } from "@/store/calculations";
+import { getCartTileImages, isTilePattern } from "@/data/tileAssets";
+import { designPalette } from "@/data/tiles";
 import type { CartItem } from "@/types/order";
 
 // Данные связывают позиции корзины с готовыми PNG-плитками из папки public/mock.
-const tileImages: Record<string, { collection: string; item: string }> = {
-  "ocean-wave": { collection: "/mock/ocean_wave.png", item: "/mock/ocean_wave_item.png" },
-  "forest-fern": { collection: "/mock/forest_fern.png", item: "/mock/forest_fern_item.png" },
-  "terracotta-dot": { collection: "/mock/terracita_dot.png", item: "/mock/terracota_dot_item.png" },
-  "yellow-star": { collection: "/mock/yellow_star.png", item: "/mock/yellow_star_item.png" }
-};
-
+// patternTileImages подставляет картинку для строк, которые добавлены перетаскиванием из палитры дизайна.
+// tilePatterns нужен для проверки drag-data перед добавлением новой строки в корзину.
 // CartTable выводит первую колонку интерфейса: корзину, действия, кнопку добавления и итоги.
 export function CartTable() {
   const dispatch = useAppDispatch();
@@ -21,8 +18,29 @@ export function CartTable() {
   const subtotal = calculateSubtotal(items);
   const shipping = calculateShipping(subtotal);
 
+  // handleCartDragOver разрешает drop плитки на всю область Shopping Cart.
+  function handleCartDragOver(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  }
+
+  // handleCartDrop добавляет новую позицию, когда плитку перетащили из палитры в корзину.
+  function handleCartDrop(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    const pattern = event.dataTransfer.getData("text/plain");
+    if (isTilePattern(pattern)) {
+      dispatch(addTileToCart(pattern));
+    }
+  }
+
+  // handleAddRandomTile добавляет строку со случайной плиткой из палитры.
+  function handleAddRandomTile() {
+    const randomPattern = designPalette[Math.floor(Math.random() * designPalette.length)];
+    dispatch(addTileToCart(randomPattern));
+  }
+
   return (
-    <section id="cart" className="cart-tool w-full min-w-0">
+    <section id="cart" className="cart-tool w-full min-w-0" onDragOver={handleCartDragOver} onDrop={handleCartDrop}>
       {/* Заголовок первой колонки повторяет крупную подпись из макета. */}
       <h2 className="mb-2 hidden font-display text-[var(--cart-title-size)] font-normal uppercase leading-none tracking-wide md:block">
         Shopping Cart &amp; Design Tool
@@ -46,7 +64,9 @@ export function CartTable() {
       {/* Нижняя зона: рука с плиткой, кнопка добавления и компактные итоги. */}
       <div className="cart-summary-grid cart-table-grid grid font-display font-normal uppercase leading-none">
         <div className="cart-summary-add col-span-2 row-span-3">
-          <img className="block h-auto w-[92%] object-contain object-left-top" src="/images/hand_left.png" alt="" aria-hidden="true" />
+          <button type="button" className="interactive-soft block h-auto w-[92%] cursor-pointer p-0 text-left" onClick={handleAddRandomTile} aria-label="Add random tile to cart">
+            <img className="block h-auto w-full object-contain object-left-top" src="/images/hand_left.png" alt="" aria-hidden="true" />
+          </button>
         </div>
         <span className="cart-total-label col-span-2">Subtotal:</span>
         <output className="cart-total-value">[{formatMoney(subtotal)}]</output>
@@ -73,7 +93,7 @@ function BodyCell({ children, className = "" }: { children: ReactNode; className
 // CartRow отображает одну позицию корзины и действия add/remove.
 function CartRow({ item }: { item: CartItem }) {
   const dispatch = useAppDispatch();
-  const images = tileImages[item.id] ?? tileImages["ocean-wave"];
+  const images = getCartTileImages(item.id, item.pattern);
 
   // handleQuantityChange записывает новое количество в Redux и не даёт получить отрицательное число.
   function handleQuantityChange(value: string) {
@@ -120,7 +140,7 @@ function CartRow({ item }: { item: CartItem }) {
       <BodyCell>
         <div className="flex items-center justify-center gap-1">
           <IconAction label="Add" image="/images/add.png" onClick={() => dispatch(incrementQuantity(item.id))} />
-          <IconAction label="Remove" image="/images/bascket.png" onClick={() => dispatch(decrementQuantity(item.id))} />
+          <IconAction label="Remove" image="/images/bascket.png" onClick={() => dispatch(removeItem(item.id))} />
         </div>
       </BodyCell>
     </div>
@@ -130,7 +150,7 @@ function CartRow({ item }: { item: CartItem }) {
 // IconAction рисует маленькую кнопку действия с картинкой и подписью.
 function IconAction({ label, image, onClick }: { label: string; image: string; onClick: () => void }) {
   return (
-    <button type="button" className="flex flex-col items-center font-display text-[var(--cart-action-size)] font-normal uppercase leading-none" onClick={onClick}>
+    <button type="button" className="interactive-soft flex flex-col items-center font-display text-[var(--cart-action-size)] font-normal uppercase leading-none" onClick={onClick}>
       <img className="h-[var(--cart-action-icon)] w-[var(--cart-action-icon)] object-contain" src={image} alt="" aria-hidden="true" />
       <span>{label}</span>
     </button>

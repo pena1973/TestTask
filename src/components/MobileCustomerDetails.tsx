@@ -42,13 +42,13 @@ function MobileField({ label, value, multiline = false, onChange }: { label: str
     <label className={multiline ? "mobile-field-multiline" : "block"}>
       <span>{label}:</span>
       <input
-        className="w-full border-b-3 border-line bg-transparent px-2 py-1 normal-case"
+        className="w-full border-b-3 border-line bg-transparent px-2 py-1 font-condensed font-normal normal-case"
         value={multiline ? firstLine : value}
         onChange={(event) => (multiline ? handleMultilineChange(event.target.value, secondLine) : onChange(event.target.value))}
       />
       {multiline ? (
         <input
-          className="mobile-field-extra-line w-full border-b-3 border-line bg-transparent px-2 py-1 normal-case"
+          className="mobile-field-extra-line w-full border-b-3 border-line bg-transparent px-2 py-1 font-condensed font-normal normal-case"
           value={secondLine}
           onChange={(event) => handleMultilineChange(firstLine, event.target.value)}
           aria-label={`${label} second line`}

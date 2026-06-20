@@ -4,35 +4,9 @@ import type { FormEvent } from "react";
 import { calculateShipping, calculateSubtotal, formatMoney } from "@/store/calculations";
 import { setPaymentMethod, submitOrder, updateFormField } from "@/store/orderSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { maskCheckoutField } from "@/utils/inputMasks";
+import { getFormErrors } from "@/utils/validation";
 import type { CheckoutFormValues, PaymentMethod } from "@/types/order";
-
-// validateEmail проверяет базовый формат email для checkout-формы.
-function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// validateCardNumber проверяет, что номер карты содержит не меньше 12 цифр.
-function validateCardNumber(cardNumber: string): boolean {
-  return cardNumber.replace(/\D/g, "").length >= 12;
-}
-
-// getFormErrors собирает ошибки обязательных полей и платёжных данных.
-function getFormErrors(form: CheckoutFormValues, paymentMethod: PaymentMethod): Partial<Record<keyof CheckoutFormValues, string>> {
-  const errors: Partial<Record<keyof CheckoutFormValues, string>> = {};
-
-  if (!form.customerName.trim()) errors.customerName = "Required";
-  if (!form.phone.trim()) errors.phone = "Required";
-  if (!validateEmail(form.email)) errors.email = "Invalid email";
-  if (!form.shippingAddress.trim()) errors.shippingAddress = "Required";
-
-  if (paymentMethod === "card") {
-    if (!validateCardNumber(form.cardNumber)) errors.cardNumber = "Invalid card";
-    if (!form.expiration.trim()) errors.expiration = "Required";
-    if (!/^\d{3,4}$/.test(form.cvv.trim())) errors.cvv = "Invalid CVV";
-  }
-
-  return errors;
-}
 
 // CheckoutForm рисует компактный правый блок Order Summary из desktop-макета.
 export function CheckoutForm() {
@@ -45,7 +19,7 @@ export function CheckoutForm() {
 
   // handleFieldChange обновляет одно поле формы по его имени.
   function handleFieldChange(field: keyof CheckoutFormValues, value: string) {
-    dispatch(updateFormField({ field, value }));
+    dispatch(updateFormField({ field, value: maskCheckoutField(field, value) }));
   }
 
   // handleSubmit запускает клиентскую валидацию без backend-запроса.
@@ -109,10 +83,10 @@ export function CheckoutForm() {
               <span className="-ml-1 h-3.5 w-3.5 rounded-full bg-ochre" />
             </span>
           </div>
-          <CompactInput label="Card Number" placeholder="1234 4556 7723 8990" value={form.cardNumber} error={submitted ? errors.cardNumber : undefined} onChange={(value) => handleFieldChange("cardNumber", value)} />
+          <CompactInput label="Card Number" placeholder="1234 4556 7723 8990" value={form.cardNumber} error={submitted ? errors.cardNumber : undefined} inputMode="numeric" onChange={(value) => handleFieldChange("cardNumber", value)} />
           <div className="mt-1 grid grid-cols-2 gap-[var(--summary-gap)]">
-            <CompactInput label="Expiration /" placeholder="05/29" value={form.expiration} error={submitted ? errors.expiration : undefined} onChange={(value) => handleFieldChange("expiration", value)} />
-            <CompactInput label="CVV" placeholder="123" value={form.cvv} error={submitted ? errors.cvv : undefined} onChange={(value) => handleFieldChange("cvv", value)} />
+            <CompactInput label="Expiration /" placeholder="05/29" value={form.expiration} error={submitted ? errors.expiration : undefined} inputMode="numeric" onChange={(value) => handleFieldChange("expiration", value)} />
+            <CompactInput label="CVV" placeholder="123" value={form.cvv} error={submitted ? errors.cvv : undefined} inputMode="numeric" onChange={(value) => handleFieldChange("cvv", value)} />
           </div>
         </div>
 
@@ -128,7 +102,7 @@ export function CheckoutForm() {
         </div>
 
         {/* Кнопка отправки запускает только frontend-валидацию. */}
-        <button type="submit" className="w-full rounded-md border border-line bg-navy px-3 py-[var(--summary-button-y)] font-display text-[var(--summary-button-size)] font-normal uppercase leading-none text-paper shadow-sketch">
+        <button type="submit" className="interactive-soft w-full rounded-md border border-line bg-navy px-3 py-[var(--summary-button-y)] font-display text-[var(--summary-button-size)] font-normal uppercase leading-none text-paper shadow-sketch">
           Place Secure Order
         </button>
 
@@ -174,7 +148,7 @@ function MobilePaymentPanel({
       {/* Project notes в мобильном дизайне перенесены под оплату отдельной строкой. */}
       <label className="mt-3 flex items-end gap-3 font-display text-[clamp(16px,3.5vw,22px)] font-normal uppercase leading-none">
         <span className="shrink-0">Project Name / Notes:</span>
-        <input className="min-w-0 flex-1 border-b-3 border-line bg-transparent px-2 leading-none" value={projectNotes} onChange={(event) => onProjectNotesChange(event.target.value)} />        
+        <input className="min-w-0 flex-1 border-b-3 border-line bg-transparent px-2 font-condensed font-normal leading-none" value={projectNotes} onChange={(event) => onProjectNotesChange(event.target.value)} />        
       </label>       
       
     </div>
@@ -184,7 +158,7 @@ function MobilePaymentPanel({
 // MobilePayButton рисует одну мобильную кнопку способа оплаты с круглым индикатором.
 function MobilePayButton({ method, title, icon, selected, onSelect }: { method: PaymentMethod; title: string; icon: "card" | "paypal" | "apple" | "bank"; selected: boolean; onSelect: (method: PaymentMethod) => void }) {
   return (
-    <button type="button" className="grid min-h-[82px] grid-cols-[18px_1fr] items-start border-r-2 border-line px-1.5 py-2 text-left last:border-r-0" onClick={() => onSelect(method)}>
+    <button type="button" className="interactive-soft grid min-h-[82px] grid-cols-[18px_1fr] items-start border-r-2 border-line px-1.5 py-2 text-left last:border-r-0 hover:bg-sand/40" onClick={() => onSelect(method)}>
       <span className={`mt-2 h-4 w-4 rounded-full border-2 border-line ${selected ? "bg-ochre" : "bg-paper"}`} />
       <span className="grid justify-items-center gap-1 text-center">
         <MobilePayIcon icon={icon} />
@@ -218,14 +192,16 @@ function CompactField({ label, placeholder, value, error, multiline = false, onC
     <label className={multiline ? "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-end gap-x-1 gap-y-1 overflow-hidden" : "flex min-w-0 items-end gap-1 overflow-hidden"}>
       <span className="shrink-0">{label}:</span>
       <input
-        className={`min-w-0 flex-1 border-b-2 bg-transparent px-1 leading-none placeholder:text-ink/70 ${error ? "border-terracotta" : "border-line"}`}
+        className={`min-w-0 flex-1 border-b-2 bg-transparent px-1 font-condensed text-[var(--summary-radio-size)] font-normal leading-none placeholder:font-normal placeholder:text-muted/55 ${error ? "border-terracotta" : "border-line"}`}
         placeholder={placeholder}
         value={multiline ? firstLine : value}
+        aria-invalid={Boolean(error)}
+        title={error}
         onChange={(event) => (multiline ? handleMultilineChange(event.target.value, secondLine) : onChange(event.target.value))}
       />
       {multiline ? (
         <input
-          className="col-span-2 min-w-0 border-b-2 border-line bg-transparent px-1 leading-none placeholder:text-ink/70"
+          className="col-span-2 min-w-0 border-b-2 border-line bg-transparent px-1 font-condensed text-[var(--summary-radio-size)] font-normal leading-none placeholder:font-normal placeholder:text-muted/55"
           value={secondLine}
           onChange={(event) => handleMultilineChange(firstLine, event.target.value)}
           aria-label={`${label} second line`}
@@ -236,14 +212,17 @@ function CompactField({ label, placeholder, value, error, multiline = false, onC
 }
 
 // CompactInput рисует маленькое поле внутри карточного блока.
-function CompactInput({ label, placeholder, value, error, onChange }: { label: string; placeholder: string; value: string; error?: string; onChange: (value: string) => void }) {
+function CompactInput({ label, placeholder, value, error, inputMode = "text", onChange }: { label: string; placeholder: string; value: string; error?: string; inputMode?: "text" | "numeric"; onChange: (value: string) => void }) {
   return (
     <label className="block font-display text-xs font-normal uppercase leading-tight">
       <span>{label}</span>
       <input
-        className={`mt-0.5 h-[var(--summary-input-height)] w-full rounded border bg-paper px-[var(--summary-title-x)] text-[var(--summary-radio-size)] normal-case placeholder:text-ink/70 ${error ? "border-terracotta" : "border-line"}`}
+        className={`mt-0.5 h-[var(--summary-input-height)] w-full rounded border bg-paper px-[var(--summary-title-x)] font-condensed text-[var(--summary-radio-size)] font-normal normal-case placeholder:font-normal placeholder:text-muted/55 ${error ? "border-terracotta" : "border-line"}`}
         placeholder={placeholder}
         value={value}
+        inputMode={inputMode}
+        aria-invalid={Boolean(error)}
+        title={error}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
@@ -263,7 +242,7 @@ function SummaryLine({ label, value }: { label: string; value: string }) {
 // PaymentRadio рисует компактный radio-переключатель метода оплаты.
 function PaymentRadio({ label, logo, selected, onSelect }: { id: PaymentMethod; label: string; logo?: string; selected: boolean; onSelect: () => void }) {
   return (
-    <button type="button" className="flex items-center gap-2 text-left leading-none" onClick={onSelect}>
+    <button type="button" className="interactive-soft flex items-center gap-2 text-left leading-none" onClick={onSelect}>
       <span className={`h-4 w-4 rounded-full border-2 border-line ${selected ? "bg-ochre" : "bg-paper"}`} />
       {logo ? <img className="h-6 w-16 object-contain object-left" src={logo} alt={label} /> : <span>{label}</span>}
     </button>
@@ -273,7 +252,7 @@ function PaymentRadio({ label, logo, selected, onSelect }: { id: PaymentMethod; 
 // PaymentTile рисует крупную нижнюю плитку метода оплаты.
 function PaymentTile({ title, icon, iconClassName = "h-8 w-20", selected, onSelect }: { id: PaymentMethod; title: string; icon: string; iconClassName?: string; selected: boolean; onSelect: () => void }) {
   return (
-    <button type="button" className={`min-h-16 rounded border border-line p-2 font-display font-normal uppercase leading-none ${selected ? "bg-sand shadow-sketch" : "bg-paper/70"}`} onClick={onSelect}>
+    <button type="button" className={`interactive-soft min-h-16 rounded border border-line p-2 font-display font-normal uppercase leading-none hover:bg-sand/60 ${selected ? "bg-sand shadow-sketch" : "bg-paper/70"}`} onClick={onSelect}>
       <span className="mb-1 flex items-center gap-2 text-left text-sm">
         <span className={`h-4 w-4 shrink-0 rounded-full border-2 border-line ${selected ? "bg-ochre" : "bg-paper"}`} />
         <img className={`${iconClassName} object-contain object-left`} src={icon} alt={title} />

@@ -18,6 +18,7 @@ const config: Config = {
       },
       fontFamily: {
         display: ["var(--font-display)", "Arial Narrow", "Impact", "sans-serif"],
+        condensed: ["Arial Narrow", "Roboto Condensed", "Arial", "sans-serif"],
         sans: ["var(--font-body)", "Arial", "sans-serif"]
       },
       boxShadow: {

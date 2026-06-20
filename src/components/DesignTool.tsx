@@ -1,33 +1,13 @@
 "use client";
 
 import type { CSSProperties, DragEvent } from "react";
-import { clearGridCell, paintGridCell, selectPattern } from "@/store/orderSlice";
+import { clearGridCell, moveGridCell, paintGridCell, selectPattern } from "@/store/orderSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { designTileImages, isTilePattern } from "@/data/tileAssets";
 import { designPalette } from "@/data/tiles";
 import type { DesignCell, TilePattern } from "@/types/order";
 
 // Карта связывает логический id плитки с PNG-файлом из public/mock.
-const designTileImages: Record<TilePattern, string> = {
-  wave: "/mock/ocean_wave_item.png",
-  fern: "/mock/forest_fern_item.png",
-  dot: "/mock/terracota_dot_item.png",
-  star: "/mock/yellow_star_item.png",
-  diamond: "/mock/tile_02.png",
-  blueStar: "/mock/tile_05.png",
-  weave: "/mock/tile_06.png",
-  bird: "/mock/tile_10.png",
-  tile01: "/mock/tile_01.png",
-  tile02: "/mock/tile_02.png",
-  tile03: "/mock/tile_03.png",
-  tile04: "/mock/tile_04.png",
-  tile05: "/mock/tile_05.png",
-  tile06: "/mock/tile_06.png",
-  tile07: "/mock/tile_07.png",
-  tile08: "/mock/tile_08.png",
-  tile09: "/mock/tile_09.png",
-  tile10: "/mock/tile_10.png"
-};
-
 // Размер одной ячейки нужен, чтобы viewport показывал ровно 7x6, а всё поле было 10x10.
 const CELL_SIZE = 70;
 const SCROLLBAR_RESERVE = 18;
@@ -46,9 +26,13 @@ export function DesignTool() {
   } as CSSProperties;
 
   // handleDrop кладёт копию перетаскиваемой плитки в ячейку; из палитры она не исчезает.
-  function handleDrop(cellId: string, pattern: TilePattern) {
-    dispatch(selectPattern(pattern));
-    dispatch(paintGridCell(cellId));
+  function handleDrop(cellId: string, pattern: TilePattern, sourceCellId?: string) {
+    if (sourceCellId) {
+      dispatch(moveGridCell({ fromId: sourceCellId, toId: cellId, pattern }));
+      return;
+    }
+
+    dispatch(paintGridCell({ id: cellId, pattern }));
   }
 
   return (
@@ -73,9 +57,7 @@ export function DesignTool() {
               <DesignCellButton
                 key={cell.id}
                 cell={cell}
-                selectedPattern={selectedPattern}
-                onDropTile={(pattern) => handleDrop(cell.id, pattern)}
-                onPaint={() => dispatch(paintGridCell(cell.id))}
+                onDropTile={(pattern, sourceCellId) => handleDrop(cell.id, pattern, sourceCellId)}
                 onClear={() => dispatch(clearGridCell(cell.id))}
               />
             ))}
@@ -99,38 +81,50 @@ export function DesignTool() {
 // DesignCellButton отвечает за одну ячейку поля: клик кладёт выбранную плитку, drop кладёт перетаскиваемую.
 function DesignCellButton({
   cell,
-  selectedPattern,
   onDropTile,
-  onPaint,
   onClear
 }: {
   cell: DesignCell;
-  selectedPattern: TilePattern;
-  onDropTile: (pattern: TilePattern) => void;
-  onPaint: () => void;
+  onDropTile: (pattern: TilePattern, sourceCellId?: string) => void;
   onClear: () => void;
 }) {
   // handleDragOver разрешает браузеру принять drop в эту ячейку.
   function handleDragOver(event: DragEvent<HTMLButtonElement>) {
     event.preventDefault();
+    event.dataTransfer.dropEffect = event.dataTransfer.types.includes("application/x-design-cell-id") ? "move" : "copy";
+  }
+
+  // handleDragStart кладёт в drag-data паттерн и id исходной ячейки, чтобы плитку можно было перенести.
+  function handleDragStart(event: DragEvent<HTMLButtonElement>) {
+    if (!cell.pattern) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.setData("text/plain", cell.pattern);
+    event.dataTransfer.setData("application/x-design-cell-id", cell.id);
+    event.dataTransfer.effectAllowed = "copyMove";
   }
 
   // handleDrop читает id плитки из drag data и размещает её в текущей ячейке.
   function handleDrop(event: DragEvent<HTMLButtonElement>) {
     event.preventDefault();
-    const pattern = event.dataTransfer.getData("text/plain") as TilePattern;
-    if (pattern) {
-      onDropTile(pattern);
+    const pattern = event.dataTransfer.getData("text/plain");
+    const sourceCellId = event.dataTransfer.getData("application/x-design-cell-id") || undefined;
+
+    if (isTilePattern(pattern)) {
+      onDropTile(pattern, sourceCellId);
     }
   }
 
   return (
     <button
       type="button"
+      draggable={Boolean(cell.pattern)}
       aria-label="Design grid cell"
-      className="grid min-h-0 place-items-center bg-transparent p-0 transition hover:bg-sand/60"
-      onClick={onPaint}
+      className={`interactive-soft grid min-h-0 place-items-center bg-transparent p-0 hover:bg-sand/60 ${cell.pattern ? "cursor-grab active:cursor-grabbing" : ""}`}
       onDoubleClick={onClear}
+      onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
@@ -146,7 +140,6 @@ function PaletteButton({ pattern, selected, onSelect }: { pattern: TilePattern; 
   function handleDragStart(event: DragEvent<HTMLButtonElement>) {
     event.dataTransfer.setData("text/plain", pattern);
     event.dataTransfer.effectAllowed = "copy";
-    onSelect();
   }
 
   return (
@@ -154,7 +147,7 @@ function PaletteButton({ pattern, selected, onSelect }: { pattern: TilePattern; 
       type="button"
       draggable
       aria-label={`Drag ${pattern} tile`}
-      className={`grid h-[var(--design-palette-tile-size)] w-[var(--design-palette-tile-size)] place-items-center border bg-paper p-0.5 transition ${selected ? "border-navy shadow-sketch" : "border-line"}`}
+      className={`interactive-soft grid h-[var(--design-palette-tile-size)] w-[var(--design-palette-tile-size)] cursor-grab place-items-center border bg-paper p-0.5 active:cursor-grabbing ${selected ? "border-navy shadow-sketch" : "border-line"}`}
       onClick={onSelect}
       onDragStart={handleDragStart}
     >

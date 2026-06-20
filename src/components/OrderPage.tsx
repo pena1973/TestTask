@@ -1,6 +1,5 @@
 import { CartTable } from "@/components/CartTable";
 import { CheckoutForm } from "@/components/CheckoutForm";
-import { DecorativeFrame } from "@/components/DecorativeFrame";
 import { DesignTool } from "@/components/DesignTool";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -16,9 +15,6 @@ export function OrderPage() {
 
       {/* Рабочая область: здесь начинается растянутый background.png. */}
       <div className="page-background relative overflow-hidden">
-        {/* DecorativeFrame: компонент оставлен в дереве, но сейчас не рисует боковые плитки. */}
-        <DecorativeFrame />
-
         {/* Header: первый элемент рабочей области с центральным заголовком заказа. */}
         <Header />
 
