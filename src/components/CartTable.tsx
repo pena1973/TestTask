@@ -29,8 +29,8 @@ export function CartTable() {
       </h2>
 
       {/* Grid-таблица сохраняет пропорции колонок и корректно сжимается вместе с первой областью. */}
-      <div className="w-full overflow-hidden border-2 border-b-0 border-line bg-paper/70 font-display">
-        <div className="cart-table-grid grid text-center text-[var(--cart-header-size)] font-normal uppercase leading-tight">
+      <div className="cart-table-shell w-full overflow-visible border-2 border-b-0 border-l-0 border-line font-display">
+        <div className="cart-table-grid cart-table-head grid text-center text-[var(--cart-header-size)] font-normal uppercase leading-tight">
           <HeaderCell>Tile Collection</HeaderCell>
           <HeaderCell>Item</HeaderCell>
           <HeaderCell>Quantity (sq. ft.)</HeaderCell>
@@ -42,37 +42,32 @@ export function CartTable() {
         {items.map((item) => (
           <CartRow key={item.id} item={item} />
         ))}
-      </div>
 
       {/* Нижняя зона: рука с плиткой, кнопка добавления и компактные итоги. */}
-      <div className="cart-totals-grid col-span-2 grid font-display font-normal uppercase leading-none">
-        <img className="block h-auto w-[92%] object-contain object-left-top" src="/images/hand_left.png" alt="" aria-hidden="true" />
-        <div className="cart-total-labels">
-          <span className="flex min-h-8 items-center justify-end pr-2 text-right font-normal tracking-wide">Subtotal:</span>
-          <span className="flex min-h-8 items-center justify-end pr-2 text-right font-normal tracking-wide">Shipping:</span>
-          <span className="flex min-h-8 items-center justify-end pr-2 text-right font-normal tracking-wide">Grand Total:</span>
+      <div className="cart-summary-grid cart-table-grid grid font-display font-normal uppercase leading-none">
+        <div className="cart-summary-add col-span-2 row-span-3">
+          <img className="block h-auto w-[92%] object-contain object-left-top" src="/images/hand_left.png" alt="" aria-hidden="true" />
         </div>
-
-        <div className="cart-total-values">
-          <output className="flex min-h-8 w-full items-center justify-end border-b-2 border-l-2 border-r-2 border-line bg-paper px-1 text-right font-normal">[{formatMoney(subtotal)}]</output>
-          <output className="flex min-h-8 w-full items-center justify-end border-b-2 border-l-2 border-r-2 border-line bg-paper px-1 text-right font-normal">[{formatMoney(shipping)}]</output>
-          <output className="flex min-h-8 w-full items-center justify-end border-b-2 border-l-2 border-r-2 border-line bg-paper px-1 text-right font-normal">[{formatMoney(subtotal + shipping)} ]</output>
-        </div>
-
+        <span className="cart-total-label col-span-2">Subtotal:</span>
+        <output className="cart-total-value">[{formatMoney(subtotal)}]</output>
+        <span className="cart-total-label col-span-2">Shipping:</span>
+        <output className="cart-total-value">[{formatMoney(shipping)}]</output>
+        <span className="cart-total-label col-span-2">Grand Total:</span>
+        <output className="cart-total-value cart-total-grand">[{formatMoney(subtotal + shipping)}]</output>
       </div>
-      {/* </div> */}
+      </div>
     </section>
   );
 }
 
 // HeaderCell рисует одну ячейку заголовка grid-таблицы.
 function HeaderCell({ children }: { children: ReactNode }) {
-  return <div className="grid min-h-10 place-items-center border-b-2 border-r-2 border-line px-1 last:border-r-0">{children}</div>;
+  return <div className="grid min-h-10 place-items-center border-b-2 border-r-2 border-line px-1 first:border-l-2 last:border-r-0">{children}</div>;
 }
 
 // BodyCell рисует одну ячейку строки товара.
 function BodyCell({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`grid min-h-[var(--cart-row-height)] place-items-center border-b-2 border-r-2 border-line px-[var(--cart-cell-padding)] last:border-r-0 ${className}`}>{children}</div>;
+  return <div className={`grid min-h-[var(--cart-row-height)] place-items-center border-b-2 border-r-2 border-line px-[var(--cart-cell-padding)] first:border-l-2 last:border-r-0 ${className}`}>{children}</div>;
 }
 
 // CartRow отображает одну позицию корзины и действия add/remove.

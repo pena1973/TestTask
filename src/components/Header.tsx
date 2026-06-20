@@ -3,14 +3,14 @@ export function Header() {
   return (
     <div className="site-title px-4 py-4 text-center md:px-8">
       {/* Центральная часть разделена на три зоны: левая иконка, основной текст, правая иконка. */}
-      <div className="mx-auto grid max-w-[860px] grid-cols-1 items-center gap-1 md:grid-cols-[130px_minmax(0,1fr)_130px]">
+      <div className="mx-auto grid max-w-[860px] grid-cols-1 items-center gap-1 min-[1360px]:grid-cols-[130px_minmax(0,1fr)_130px]">
         {/* Левая часть: картинка мастерской из public/images/pic1.png. */}
         <WorkshopImage />
 
         {/* Центральная часть: главный заголовок и строка с шестью плитками из public. */}
         <div className="min-w-0">
           {/* Заголовок формы использует узкий Google Font, чтобы повторить вытянутый стиль макета. */}
-          <h1 className="brand-title text-[46px] font-normal uppercase leading-none md:text-[54px] lg:text-[62px]">
+          <h1 className="brand-title whitespace-nowrap text-[46px] font-normal uppercase leading-none md:text-[54px] lg:text-[62px]">
             Ceramic Tile Order Form
           </h1>
 
@@ -42,10 +42,10 @@ function TileImage({ src, alt }: { src: string; alt: string }) {
 
 // WorkshopImage выводит левую декоративную картинку здания из папки public.
 function WorkshopImage() {
-  return <img className="hidden h-[130px] w-[130px] object-contain md:block" src="/images/pic1.png" alt="Workshop" />;
+  return <img className="hidden h-[130px] w-[130px] object-contain min-[1360px]:block" src="/images/pic1.png" alt="Workshop" />;
 }
 
 // KilnImage выводит правую декоративную картинку печи из папки public.
 function KilnImage() {
-  return <img className="hidden h-[130px] w-[130px] object-contain md:block" src="/images/pic2.png" alt="Kiln" />;
+  return <img className="hidden h-[130px] w-[130px] object-contain min-[1360px]:block" src="/images/pic2.png" alt="Kiln" />;
 }
