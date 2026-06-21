@@ -1,67 +1,68 @@
-# The Artisan Kiln: Ceramic Tile Order Form
+# The Artisan Kiln: Форма заказа керамической плитки
 
-Frontend implementation for the Tile Expert test task:
+Фронтенд-реализация тестового задания Tile Expert:
 https://gitlab.com/tile-expert-test-tasks/frontend
 
-The project is a responsive ceramic tile order form with a shopping cart, checkout form, payment method selector, and desktop design tool.
+Проект представляет собой адаптивную форму заказа керамической плитки с корзиной покупок, формой оформления заказа, выбором способа оплаты и настольным инструментом проектирования.
 
-## Stack
+## Стек технологий
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- Redux Toolkit
-- React Redux
+* Next.js
+* TypeScript
+* Tailwind CSS
+* Redux Toolkit
+* React Redux
 
-The app is frontend-only. There is no backend integration; order submission is handled as a client-side demo action.
+Приложение работает только на стороне клиента (frontend). Интеграция с сервером отсутствует; отправка заказа реализована как демонстрационное действие на клиентской стороне.
 
-## Implemented Features
+## Реализованные возможности
 
-- Responsive layout based on the provided desktop and mobile designs in `design/`.
-- Shopping cart with editable quantity, item removal, totals, and random tile addition.
-- Drag-and-drop tile adding from the design palette to the cart.
-- Desktop design tool with a scrollable `10x10` grid and visible `7x6` working area.
-- Drag-and-drop from the palette into design cells.
-- Drag-and-drop movement of already placed tiles between grid cells.
-- Double-click removal of a tile from a design cell.
-- Checkout form with payment method selection.
-- Card block visibility only for the credit/debit card payment method.
-- Input masks for card number and expiration date.
-- Client-side validation for required fields, email, card number, expiration date, and CVV.
-- Mobile-specific customer details and payment layout.
-- Shared Redux state for cart, design tool, payment method, and form values.
-- Shared helpers for tile assets, input masks, validation, and calculations.
-- Lightweight hover/active/focus states for clickable UI elements.
+* Адаптивная верстка на основе предоставленных макетов для десктопной и мобильной версий из папки `design/`.
+* Корзина покупок с возможностью изменения количества товаров, удаления позиций, автоматическим пересчётом итогов и добавлением случайной плитки.
+* Добавление плитки в корзину с помощью drag-and-drop из палитры конструктора.
+* Настольный инструмент проектирования с прокручиваемой сеткой `10x10` и видимой рабочей областью `7x6`.
+* Перетаскивание плитки из палитры в ячейки сетки.
+* Перемещение уже размещённых плиток между ячейками сетки с помощью drag-and-drop.
+* Удаление плитки из ячейки двойным щелчком мыши.
+* Форма оформления заказа с выбором способа оплаты.
+* Отображение блока данных банковской карты только при выборе оплаты кредитной или дебетовой картой.
+* Маски ввода для номера карты и срока действия.
+* Клиентская валидация обязательных полей, адреса электронной почты, номера карты, срока действия карты и CVV-кода.
+* Отдельная мобильная компоновка данных клиента и блока оплаты.
+* Общее состояние Redux для корзины, конструктора, выбранного способа оплаты и данных формы.
+* Общие вспомогательные функции для работы с изображениями плитки, масками ввода, валидацией и расчётами.
+* Лёгкие эффекты наведения, нажатия и фокуса для интерактивных элементов интерфейса.
 
-## User Instructions
+## Инструкция для пользователя
 
-### Shopping Cart
+### Корзина покупок
 
-- Use the `Add` icon in a row to increase the item quantity.
-- Use the `Remove` icon in a row to remove that item from the cart.
-- Click `Add New Tile To Cart` to add a random tile row.
-- Drag a tile from the desktop design palette into the shopping cart to add that tile as a new row.
-- Cart totals update automatically.
+* Используйте значок **Add** в строке товара, чтобы увеличить количество.
+* Используйте значок **Remove**, чтобы удалить товар из корзины.
+* Нажмите **Add New Tile To Cart**, чтобы добавить случайную плитку.
+* Перетащите плитку из палитры конструктора в корзину, чтобы добавить её как новую позицию.
+* Итоговые суммы пересчитываются автоматически.
 
-### Design Tool
+### Конструктор дизайна
 
-The design tool is available on desktop screens.
+Конструктор доступен только на настольных устройствах.
 
-- Drag a tile from the palette into a grid cell to place it.
-- Drag an already placed tile to another cell to move it.
-- Double-click a filled cell to remove the tile.
-- Use the scrollbars to move through the full `10x10` design grid.
+* Перетащите плитку из палитры в ячейку сетки, чтобы разместить её.
+* Перетащите уже размещённую плитку в другую ячейку, чтобы переместить её.
+* Дважды щёлкните по заполненной ячейке, чтобы удалить плитку.
+* Используйте полосы прокрутки для перемещения по всей сетке проекта размером `10x10`.
 
-### Checkout
+### Оформление заказа
 
-- Fill in customer name, phone, email, and shipping address.
-- Email must use a valid format, for example `name@example.com`.
-- For card payment, fill in:
-  - card number in `0000 0000 0000 0000` format;
-  - expiration date in `MM/YY` format;
-  - CVV with `3` or `4` digits.
-- Choosing PayPal, Apple Pay, or Bank Transfer hides the card input block.
-- Click `Place Secure Order` to run frontend validation.
+* Заполните имя клиента, телефон, адрес электронной почты и адрес доставки.
+* Email должен быть указан в корректном формате, например: `name@example.com`.
+* При оплате картой необходимо заполнить:
+
+  * номер карты в формате `0000 0000 0000 0000`;
+  * срок действия в формате `MM/YY`;
+  * CVV-код из `3` или `4` цифр.
+* При выборе PayPal, Apple Pay или банковского перевода блок ввода данных карты скрывается.
+* Нажмите **Place Secure Order**, чтобы запустить клиентскую проверку данных формы.
 
 ## Getting Started
 
